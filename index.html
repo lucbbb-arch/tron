@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【您的公司名称】 - 官方网站</title>
+    <!-- 加载 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 加载 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 设置自定义颜色配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a1a',    /* 深灰黑色 - 主文字 */
+                        secondary: '#f5f5f0',  /* 暖米色 - 页面背景 */
+                        accent: '#c5a065',     /* 金色 - 强调色 */
+                        surface: '#ffffff',    /* 白色 - 卡片背景 */
+                    },
+                    fontFamily: {
+                        sans: ['Helvetica Neue', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 图表容器样式 - 强制响应式约束 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        /* 简单的淡入动画 */
+        .fade-in {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 导航栏滚动时的样式变化 */
+        #navbar.scrolled {
+            background-color: rgba(26, 26, 26, 0.9); /* 滚动后变深色背景 */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #navbar.scrolled a {
+            color: white;
+        }
+        
+        <!-- Chosen Palette: Modern Luxury with Dark Video Overlay -->
+        <!-- Application Structure Plan: 
+            1. Video Hero: Full-screen video background to create immediate visual impact.
+            2. Dark Overlay: Ensures text readability regardless of video brightness.
+            3. Sticky Nav: Transparent initially, turns dark on scroll for better UX.
+            4. Rest of sections remain clean and structured.
+        -->
+        <!-- Visualization & Content Choices:
+            - Video: Uses <video> tag with 'autoplay loop muted playsinline'.
+            - Overlay: 'bg-black/50' utility class.
+        -->
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    </style>
+</head>
+<body class="bg-secondary text-primary font-sans antialiased selection:bg-accent selection:text-white">
+
+    <!-- 导航栏 (初始透明，滚动变色) -->
+    <nav class="fixed w-full z-50 transition-all duration-300 text-white" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-2xl font-bold tracking-tighter hover:text-accent transition-colors">
+                        【LOGO/公司名】
+                    </a>
+                </div>
+                <!-- 桌面端菜单 -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-colors">首页</a>
+                        <a href="#about" class="hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-colors">关于我们</a>
+                        <a href="#services" class="hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-colors">核心服务</a>
+                        <a href="#analysis" class="hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-colors">数据洞察</a>
+                        <a href="#contact" class="bg-accent text-white hover:bg-white hover:text-primary px-5 py-2 rounded-full text-sm font-medium transition-colors">联系我们</a>
+                    </div>
+                </div>
+                <!-- 移动端菜单按钮 (Unicode) -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-3xl focus:outline-none text-white">
+                        &#9776;
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单面板 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary border-t border-gray-800 absolute w-full">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-800 hover:text-accent">首页</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-800 hover:text-accent">关于我们</a>
+                <a href="#services" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-800 hover:text-accent">核心服务</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-accent font-bold">联系我们</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首页 Hero 区域 (全屏视频背景) -->
+    <section id="home" class="relative w-full h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+        
+        <!-- 1. 视频背景层 -->
+        <!-- 如果您有自己的视频文件，请将 src 替换为您的文件路径，例如 src="images/background-video.mp4" -->
+        <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
+            <!-- 这里使用了一个在线演示视频，请替换为您自己的视频 -->
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-people-working-in-a-modern-office-4348-large.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+
+        <!-- 2. 黑色遮罩层 (调整 opacity-50 可以改变遮罩深浅) -->
+        <div class="absolute top-0 left-0 w-full h-full bg-black/60 z-10"></div>
+
+        <!-- 3. 文字内容层 -->
+        <div class="relative z-20 px-4 max-w-7xl mx-auto text-center text-white fade-in pt-10">
+            <span class="text-accent font-bold tracking-[0.3em] uppercase text-sm mb-6 block">Future & Innovation</span>
+            
+            <!-- 核心价值主张 -->
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight drop-shadow-lg">
+                【在这里输入您的<br>
+                <span class="text-accent">核心价值主张</span>】
+            </h1>
+            
+            <p class="max-w-2xl mx-auto text-gray-200 text-lg md:text-xl mb-12 leading-relaxed drop-shadow-md">
+                【副标题：例如 - 我们通过创新技术与卓越设计，将您的商业愿景转化为数字现实。】
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="#contact" class="px-8 py-4 bg-accent text-white rounded-full font-semibold hover:bg-white hover:text-primary transition-all transform hover:-translate-y-1 shadow-lg border border-transparent">
+                    开启合作之旅 &#8594;
+                </a>
+                <a href="#services" class="px-8 py-4 border border-white/50 text-white rounded-full font-semibold hover:bg-white hover:text-primary hover:border-white transition-all backdrop-blur-sm">
+                    探索我们的服务
+                </a>
+            </div>
+        </div>
+        
+        <!-- 底部滚动提示箭头 -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 animate-bounce text-white/50 text-2xl">
+            &#8595;
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section id="about" class="py-20 bg-surface">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <!-- 图片占位符 -->
+                <div class="relative h-96 bg-gray-200 rounded-xl overflow-hidden shadow-2xl group">
+                    <div class="absolute inset-0 flex items-center justify-center bg-gray-300 text-gray-500 font-bold text-xl group-hover:scale-105 transition-transform duration-700">
+                        【图片：公司团队/办公环境】<br>建议尺寸: 800x600
+                    </div>
+                </div>
+                <!-- 文字内容 -->
+                <div>
+                    <h2 class="text-3xl font-bold mb-6 border-l-4 border-accent pl-4 text-primary">关于【您的公司名】</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        【第一段：介绍公司背景。例如：我们要重新定义行业标准。自成立以来，我们一直致力于...】
+                    </p>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        【第二段：强调公司使命。例如：我们的使命是通过创新设计和卓越技术，为客户创造持久的价值...】
+                    </p>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <span class="block text-4xl font-bold text-accent mb-1" id="stat-1">100+</span>
+                            <span class="text-sm text-gray-500">【成功案例】</span>
+                        </div>
+                        <div>
+                            <span class="block text-4xl font-bold text-accent mb-1" id="stat-2">98%</span>
+                            <span class="text-sm text-gray-500">【客户满意度】</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心服务 -->
+    <section id="services" class="py-20 bg-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4 text-primary">我们的核心服务</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">【一句话简介：我们提供全方位的解决方案，满足您的业务需求。】</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 服务 1 -->
+                <div class="bg-surface p-8 rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group">
+                    <div class="text-4xl text-accent mb-6 group-hover:scale-110 transition-transform">&#9733;</div>
+                    <h3 class="text-xl font-bold mb-4 text-primary">【服务项目 A】</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        【详细描述：例如品牌战略规划。我们深入分析市场，为您打造独特的品牌定位。】
+                    </p>
+                    <a href="#" class="text-accent font-medium hover:text-primary transition-colors">了解详情 &rarr;</a>
+                </div>
+
+                <!-- 服务 2 -->
+                <div class="bg-surface p-8 rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group">
+                    <div class="text-4xl text-accent mb-6 group-hover:scale-110 transition-transform">&#9881;</div>
+                    <h3 class="text-xl font-bold mb-4 text-primary">【服务项目 B】</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        【详细描述：例如技术开发。使用最新的技术栈，构建高性能、可扩展的数字产品。】
+                    </p>
+                    <a href="#" class="text-accent font-medium hover:text-primary transition-colors">了解详情 &rarr;</a>
+                </div>
+
+                <!-- 服务 3 -->
+                <div class="bg-surface p-8 rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 group">
+                    <div class="text-4xl text-accent mb-6 group-hover:scale-110 transition-transform">&#9889;</div>
+                    <h3 class="text-xl font-bold mb-4 text-primary">【服务项目 C】</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        【详细描述：例如数字营销。通过数据驱动的营销策略，精准触达您的目标客户。】
+                    </p>
+                    <a href="#" class="text-accent font-medium hover:text-primary transition-colors">了解详情 &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据洞察 (Chart.js) -->
+    <section id="analysis" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6 text-primary">为什么选择我们？<br><span class="text-accent">数据说明一切</span></h2>
+                    <p class="text-gray-600 mb-6">
+                        【本区域使用图表展示您的优势。例如：与传统方案相比，我们的解决方案在效率、成本和转化率上的优势。】
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 font-bold">&#10003;</span>
+                            <span class="text-gray-700"><strong>高效率：</strong> 【描述优势点1，例如交付速度提升50%】</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 font-bold">&#10003;</span>
+                            <span class="text-gray-700"><strong>低成本：</strong> 【描述优势点2，例如长期维护成本降低30%】</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-accent mr-3 font-bold">&#10003;</span>
+                            <span class="text-gray-700"><strong>高转化：</strong> 【描述优势点3，例如用户留存率显著提高】</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 图表容器 -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-4">数据来源：【2024年度内部效能报告】</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section id="contact" class="py-20 bg-primary text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-8">准备好开始了吗？</h2>
+            <p class="text-gray-300 mb-10 text-lg">
+                【引导语：无论您是有具体的项目需求，还是想咨询解决方案，我们都随时欢迎。】
+            </p>
+            
+            <form class="bg-white/5 p-8 rounded-2xl backdrop-blur-sm border border-white/10 text-left">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">姓名</label>
+                        <input type="text" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-accent text-white placeholder-gray-500" placeholder="您的称呼">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">邮箱</label>
+                        <input type="email" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-accent text-white placeholder-gray-500" placeholder="example@company.com">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">留言内容</label>
+                    <textarea rows="4" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-accent text-white placeholder-gray-500" placeholder="请简要描述您的需求..."></textarea>
+                </div>
+                <button type="button" class="w-full bg-accent hover:bg-white hover:text-primary text-white font-bold py-4 rounded-lg transition-all duration-300">
+                    发送咨询 &#10148;
+                </button>
+            </form>
+
+            <div class="mt-12 flex flex-col md:flex-row justify-center gap-8 text-gray-400 text-sm">
+                <div>&#9993; contact@yourcompany.com</div>
+                <div>&#9742; +86 123 4567 8900</div>
+                <div>&#127968; 【您的公司地址信息】</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-black text-gray-500 py-8 border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 【您的公司名称】. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript 逻辑 -->
+    <script>
+        // 1. 导航栏滚动效果 (Navbar Scroll Effect)
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled', 'shadow-md');
+                navbar.classList.remove('bg-transparent');
+            } else {
+                navbar.classList.remove('scrolled', 'shadow-md');
+                navbar.classList.add('bg-transparent');
+            }
+        });
+
+        // 2. 移动端菜单控制
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // 3. Chart.js 图表初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置导航栏初始状态
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            }
+
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            // 数据配置 - 您可以在这里修改图表数据
+            const data = {
+                labels: ['传统方案', '竞品方案', '【我们的方案】'],
+                datasets: [{
+                    label: '综合效能评分',
+                    data: [65, 75, 95], // 修改这里的数据
+                    backgroundColor: [
+                        'rgba(200, 200, 200, 0.5)', // 灰色
+                        'rgba(200, 200, 200, 0.5)', // 灰色
+                        'rgba(197, 160, 101, 0.9)'  // 金色 (Accent Color)
+                    ],
+                    borderColor: [
+                        'rgba(200, 200, 200, 1)',
+                        'rgba(200, 200, 200, 1)',
+                        'rgba(197, 160, 101, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }]
+            };
+
+            const config = {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // 关键：适应容器高度
+                    plugins: {
+                        legend: {
+                            display: false // 隐藏图例以保持简洁
+                        },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: '#c5a065',
+                            bodyFont: {
+                                size: 14
+                            },
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' 评分: ' + context.raw + ' / 100';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                font: { family: "'Helvetica Neue', 'Arial', sans-serif" }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
+</body>
+</html>
